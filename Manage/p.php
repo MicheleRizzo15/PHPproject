@@ -45,17 +45,14 @@ echo $prodotto->getNome();
 echo $prodotto->getMarca();
 echo $prodotto->getPrezzo();
 
-$prodotto->Delete();
 
-
-$prodotto = Product::Find(15);
+$prodotto = Product::Find(16);
 
 echo $prodotto->getId();
 echo $prodotto->getNome();
 echo $prodotto->getMarca();
 echo $prodotto->getPrezzo();
 
-
-
+$prodotto->Delete();
 
 ?>

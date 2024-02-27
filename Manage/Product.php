@@ -2,7 +2,7 @@
 
 require_once "Connection.php";
 
-class Product
+class Product implements JsonSerializable
 {
     private $id;
     private $nome;
@@ -75,6 +75,9 @@ class Product
 
     public function Delete()
     {
+        if (!$this->getId()) {
+            return false;
+        }
         $id = $this->getId();
         $pdo = self::Connect();
         $stmt = $pdo->prepare("delete from michele_rizzo_ecommerce.products where id=:id");
@@ -90,16 +93,23 @@ class Product
 
     }
 
-    public function update($params)
+    public function Update($params)
     {
         $pdo = self::Connect();
         $stmt = $pdo->prepare("UPDATE michele_rizzo_ecommerce.products SET nome = :nome, prezzo = :prezzo, marca = :marca WHERE id = :id");
-        $stmt->bindParam(":nome", $params['nome']);
-        $stmt->bindParam(":prezzo", $params['prezzo']);
-        $stmt->bindParam(":marca", $params['marca']);
+        $v1 = isset($params['nome']) ? $params['nome'] : $this->getNome();
+        $v2 = isset($params['prezzo']) ? $params['prezzo'] : $this->getPrezzo();
+        $v3 = isset($params['marca']) ? $params['marca'] : $this->getMarca();
+        $stmt->bindParam(":nome", $v1);
+        $stmt->bindParam(":prezzo", $v2);
+        $stmt->bindParam(":marca", $v3);
         $stmt->bindParam(":id", $this->id);
 
-        return $stmt->execute();
+        if ($stmt->execute()) {
+            return $stmt->fetchObject("Product");
+        } else {
+            return false;
+        }
     }
 
     public static function Connect()
@@ -108,4 +118,9 @@ class Product
     }
 
 
+    public function jsonSerialize()
+    {
+        return ['id' => $this->getId(), 'attributes' => ['nome' => $this->getNome(), 'marca' => $this->getMarca(), 'prezzo' => $this->getPrezzo()]];
+
+    }
 }
