@@ -106,6 +106,9 @@ class Product implements JsonSerializable
         $stmt->bindParam(":id", $this->id);
 
         if ($stmt->execute()) {
+            $stmt = $pdo->prepare("SELECT * FROM michele_rizzo_ecommerce.products where id = :id");
+            $stmt->bindParam(":id", $this->id);
+            $stmt->execute();
             return $stmt->fetchObject("Product");
         } else {
             return false;
