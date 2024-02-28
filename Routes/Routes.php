@@ -62,8 +62,8 @@ addRoute('GET', '/products/(\d+)', function ($id) {
         header('HTTP/1.1 200 ok');
         header('Content-Type: application/vnd.api+json');
         // Costruisci la risposta JSON conforme alla JSON API
-        //$data[] = ['type' => 'products', 'id' => $product->getId(), 'attributes' => ['nome' => $product->getNome(), 'marca' => $product->getMarca(), 'prezzo' => $product->getPrezzo()]];
-        $response = ['data' => $product];
+        $data = ['type' => 'products', 'id' => $product->getId(), 'attributes' => ['nome' => $product->getNome(), 'marca' => $product->getMarca(), 'prezzo' => $product->getPrezzo()]];
+        $response = ['data' => $data];
 
         // Restituisci la risposta JSON
         echo json_encode($response, JSON_PRETTY_PRINT);
@@ -103,52 +103,44 @@ addRoute('GET', '/products', function () {
 });
 
 
-addRoute('POST', '/products', function () {
+addRoute('POST', '/products', function(){
 
-    $json = file_get_contents('php://input');
-    $data = json_decode($json, true);
-    /*header("Location: /products");
-    header('HTTP/1.1 201 CREATED');
-    header('Content-Type: application/vnd.api+json');*/
+    $data=[];
+    if (isset($_POST['data']))
+        $postData = $_POST;
+    else
+        $postData = json_decode(file_get_contents("php://input"), true);
 
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($postData['data']['attributes']['marca'], $postData['data']['attributes']['nome'], $postData['data']['attributes']['prezzo']))
+        {
+            $newProduct = Product::Create($postData["data"]["attributes"]);
+            $data =
+                [
+                    'type' => 'products',
+                    'id' => $newProduct->getId(),
+                    'attributes' =>
+                        [
+                            'nome' => $newProduct->getNome(),
+                            'marca' => $newProduct->getMarca(),
+                            'prezzo' => $newProduct->getPrezzo()
+                        ]
+                ];
 
-    //$p = Product::Create($data['attributes']);
-
-    /*//migliorare il controllo
-    if ($p) {
-        // Costruisci la risposta JSON conforme alla JSON API
-        $response = [
-            'links' => [
-                'self' => "/Products/$p->getId()",
-                'data' => [$p]
-            ]
-        ];
-
-        // Imposta gli header per indicare che la risposta è JSON
-        header('Content-Type: application/json');
-
-        http_response_code(201);
-
-        // Restituisci la risposta JSON
-        echo json_encode($response, JSON_PRETTY_PRINT);
-    }*/
-
-    try {
-        $newProduct = Product::Create($data["data"]);
-        header("Location: /products");
-        header('HTTP/1.1 201 CREATED');
-        header('Content-Type: application/vnd.api+json');
-        //$data[] = ['type' => 'products', 'id' => $newProduct->getId(), 'attributes' => ['nome' => $newProduct->getNome(), 'marca' => $newProduct->getMarca(), 'prezzo' => $newProduct->getPrezzo()]];
-        $response = ['data' => $newProduct];
-        echo json_encode($response, JSON_PRETTY_PRINT);
-
-    } catch (PDOException $e) {
-        header("Location: /products");
-        header('HTTP/1.1 500 INTERNAL SERVER ERROR');
-        header('Content-Type: application/vnd.api+json');
-        http_response_code(500);
-        echo json_encode(['error' => 'Errore nella creazione del prodotto']);
-    }
+            $response = ['data' => $data];
+            echo json_encode($response, JSON_PRETTY_PRINT);
+            header("Location: /products");
+            header('HTTP/1.1 201 CREATED');
+            http_response_code(201);
+            header('Content-Type: application/vnd.api+json');
+        }
+        else
+        {
+            header("Location: /products");
+            header('HTTP/1.1 500 INTERNAL SERVER ERROR');
+            header('Content-Type: application/vnd.api+json');
+            http_response_code(500);
+            echo json_encode(['error' => 'Errore nella creazione del prodotto']);
+        }
 
 });
 
