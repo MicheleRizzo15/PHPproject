@@ -1,5 +1,6 @@
 <?php
 require '../Manage/Product.php';
+
 // Definisci un array associativo per mappare le route
 $routes = ['GET' => [], 'POST' => [], 'PUT' => [], 'DELETE' => []];
 

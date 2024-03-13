@@ -126,4 +126,5 @@ class Product implements JsonSerializable
         return ['id' => $this->getId(), 'attributes' => ['nome' => $this->getNome(), 'marca' => $this->getMarca(), 'prezzo' => $this->getPrezzo()]];
 
     }
+
 }
