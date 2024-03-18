@@ -22,7 +22,6 @@ class ProductTest extends TestCase
         $product = Product::Create($params);
         $this->assertInstanceOf(Product::class, $product);
 
-        // Clean up: Delete the created product
         $product->Delete();
     }
 
@@ -57,7 +56,6 @@ class ProductTest extends TestCase
         $updatedProduct = $product->Update($updatedParams);
         $this->assertInstanceOf(Product::class, $updatedProduct);
 
-        // Clean up: Delete the created and updated product
         $updatedProduct->Delete();
     }
 
